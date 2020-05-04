@@ -8,7 +8,7 @@ All the raw sequencing data have been deposited in the Gene Expression Omnibus (
 
 ## Code
 
-- iCLIP data analysis for DHX36, GRSF1 and DDX3X in HEK293: [code](iclip.md)
-- BG4 RIP-seq data analysis in HEK293: [code]()
-- Ribo-seq data analysis in HEK293: [code]()
+- [iCLIP data analysis](iclip.md) for DHX36, GRSF1 and DDX3X in HEK293
+- [BG4 RIP-seq data analysis]() in HEK293
+- [Ribo-seq data analysis]() in HEK293
 
