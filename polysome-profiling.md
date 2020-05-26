@@ -6,7 +6,7 @@
 - [Trim illumina adapters and quality trimming](#trim-illumina-adapters-and-quality-trimming)
 - [Alignment](#alignment)
 - [Count reads in genes](#count-reads-in-genes)
-- [Visualization](#visualization)
+- [Downstream analysis](#downstream-analysis)
 
 
 ## Software requirements
