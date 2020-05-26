@@ -15,5 +15,5 @@ Data analyses scripts for HEK293:
 - [iCLIP](iclip.md)
 - [BG4 RIP-seq]()
 - [Polysome profiling]()
-- [Proteomics]()
+- [Proteomics](polysome-profiling.md)
 
