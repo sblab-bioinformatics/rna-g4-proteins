@@ -95,8 +95,8 @@ gtf='../reference/genes.gtf'
 
 for bam in *.bam
 do
-	bname=${bam%.bam}
-	sbatch -J $bname -o merged_counts/$bname.log --mem 16G --wrap "htseq-count -f bam -r name -s no -t exon -i gene_id -m intersection-strict $bam $gtf > merged_counts/$bname.htseq"
+  bname=${bam%.bam}
+  sbatch -J $bname -o merged_counts/$bname.log --mem 16G --wrap "htseq-count -f bam -r name -s no -t exon -i gene_id -m intersection-strict $bam $gtf > merged_counts/$bname.htseq"
 done
 ```
 
