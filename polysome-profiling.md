@@ -4,48 +4,51 @@
 - [Software requirements](#software-requirements)
 - [Libraries](#libraries)
 - [Trim illumina adapters and quality trimming](#trim-illumina-adapters-and-quality-trimming)
-- [Remove duplicates and reads with stretches of several identical nucleotides](#remove-duplicates-and-reads-with-stretches-of-several-identical-nucleotides)
 - [Alignment](#alignment)
+- [Count reads in genes](#count-reads-in-genes)
+- [Visualization](#visualization)
 
 
 ## Software requirements
 
 - [cutadapt v1.12](http://cutadapt.readthedocs.io/en/stable/guide.html)
-- Standard Unix tools: cat, awk, sort, uniq, paste, grep, pigz, cut, sbatch, nohup
-- [bwa v0.7.15-r1140](http://bio-bwa.sourceforge.net/)
-- [samtools v1.3.1](http://samtools.sourceforge.net/)
-- [sambamba v0.6.5](https://academic.oup.com/bioinformatics/article/31/12/2032/214758)
-- [igvtools v2.3.91](https://software.broadinstitute.org/software/igv/igvtools)
-- [bedtools v2.27.0](http://bedtools.readthedocs.io/en/latest/)
+- Standard Unix tools: sbatch
+- [tophat v2.1.1](https://ccb.jhu.edu/software/tophat/index.shtml)
+- [htseq v0.7.2](https://htseq.readthedocs.io/en/master/)
 - [tableCat.py](https://github.com/dariober/bioinformatics-cafe/blob/master/tableCat/tableCat.py)
-- [macs2 v2.1.1.20160309](https://github.com/taoliu/MACS)
-- [fastaRegexFinder.py v0.1.1](https://github.com/dariober/bioinformatics-cafe/tree/master/fastaRegexFinder)
-- [gat-run.py](http://gat.readthedocs.io/en/latest/contents.html)
-- [python v2.7.12](https://www.python.org/). Libraries:
 - [R v3.3.2](https://www.r-project.org/). Libraries:
   - [data.table v1.10.4](https://cran.r-project.org/web/packages/data.table/index.html)
-  - [GenomicFeatures v1.26.4](https://bioconductor.org/packages/release/bioc/html/GenomicFeatures.html)
   - [ggplot2 v2.2.1](http://ggplot2.org/)
   - [edgeR v3.16.5](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
+  - [ggfortify v0.4.10](https://cran.r-project.org/web/packages/ggfortify/index.html)
+  - [ggrepel v0.6.5](https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html)
+  - [biomaRt v2.30.0](https://bioconductor.org/packages/release/bioc/html/biomaRt.html)
+  - [gridExtra v2.2.1](https://cran.r-project.org/web/packages/gridExtra/index.html)
+  - [limma v3.30.11](http://bioconductor.org/packages/release/bioc/html/limma.html)
 
 
 ## Libraries
 
-Protein | Genotype | Replicate | File name | GEO GSE | GEO GSM
-:------:|:--------:|:---------:|:---------:|:-------:|:-------:
-DHX36 | WT | 1 | DHX36_WT1.fastq.gz | - | -
-DHX36 | WT | 2 | DHX36_WT2.fastq.gz | - | -
-DHX36 | WT | 3 | DHX36_WT3.fastq.gz | - | -
-DHX36 | EA | 1 | DHX36_EA1.fastq.gz | - | -
-DHX36 | EA | 2 | DHX36_EA2.fastq.gz | - | -
-DHX36 | EA | 3 | DHX36_EA3.fastq.gz | - | -
-GRSF1 | WT | 1 | GRSF1_WT1.fastq.gz | - | -
-GRSF1 | WT | 2 | GRSF1_WT2.fastq.gz | - | -
-GRSF1 | WT | 3 | GRSF1_WT3.fastq.gz | - | -
-GRSF1 | WT | 3 | GRSF1_WT3.fastq.gz | - | -
-DDX3X | WT | 1 | DDX3X_WT1.fastq.gz | GSE106476 | GSM2838585
-DDX3X | WT | 2 | DDX3X_WT2.fastq.gz | GSE106476 | GSM2838586
-DDX3X | WT | 3 | DDX3X_WT3.fastq.gz | GSE106476 | GSM2838587
+Polysomal fraction | File name
+:------:|:---------:
+AML | AML.fastq.gz
+AM11 | AM11.fastq.gz
+A2L | A2L.fastq.gz
+A211 | A211.fastq.gz
+A10L | A10L.fastq.gz
+A1011 | A1011.fastq.gz
+BML | BML.fastq.gz
+BM11 | BM11.fastq.gz
+B2L | B2L.fastq.gz
+B211 | B211.fastq.gz
+B10L | B10L.fastq.gz
+B1011 | B1011.fastq.gz
+CML | CML.fastq.gz
+CM11 | CM11.fastq.gz
+C2L | C2L.fastq.gz
+C211 | C211.fastq.gz
+C10L | C10L.fastq.gz
+C1011 | C1011.fastq.gz
 
 
 ## Trim illumina adapters and quality trimming
@@ -53,99 +56,151 @@ DDX3X | WT | 3 | DDX3X_WT3.fastq.gz | GSE106476 | GSM2838587
 ```bash
 cd fastq
 
-mkdir ../fastq_trimmed
+mkdir ../trimmed
 
-for fq in *.fastq.gz
-do
-  bname=${fq%.fastq.gz}
-  sbatch -J $bname -o ../fastq_trimmed/$bname.log --mem 4G --wrap "cutadapt -a AGATCGGAAGAGC -m 10 -q 10 -O 5 -o ../fastq_trimmed/$fq $fq > ../fastq_trimmed/$bname.txt"
-done
-```
-
-
-## Remove duplicates and reads with stretches of several identical nucleotides
-
-```bash
-cd fastq_trimmed
-
-mkdir ../fastq_trimmed_nodup/
-
-for fq in *.fastq.gz
-do
-  nohup zcat $fq | \
-  paste - - - - | \
-  awk 'BEGIN {FS = "\t|_"}; {print $1 "\t" $3 "_" $2 "\t" $4 "\t" $5}' | \
-  sort -k 2,2 | \
-  awk -F "\t" '!_[$2]++' | \
-  awk  'BEGIN {FS="\t|_"}; {print $1"_"$3 "\n" $2 "\n" $4 "\n" $5}' | \
-  paste -d "\t" - - - - | \
-  grep -P -v 'T{10,}' | \
-  grep -P -v 'A{10,}' | \
-  grep -P -v 'C{10,}' | \
-  grep -P -v 'G{10,}' | \
-  grep -P -v '\tT{8,}' | \
-  grep -P -v '\tA{8,}' | \
-  grep -P -v '\tG{8,}' | \
-  grep -P -v '\tC{8,}' | \
-  awk 'BEGIN{ FS = "\t" }; {print $1 "\n" $2 "\n" $3 "\n" $4}' | \
-  pigz > ../fastq_trimmed_nodup/$fq &
+for f in *.fastq.gz
+do 
+  sbatch --mem 8G -J $f -o ../trimmed/$f.out -e ../trimmed/$f.err --wrap "cutadapt -f fastq -m 10 -e 0.1 -q 20 -O 4 -a AGATCGGAAGAGC -o ../trimmed/${f%%.fastq.gz}.trimmed.fq.gz $f"
 done
 ```
 
 
 ## Alignment
 
-### Prepare reference genome
+Using `hg19` reference genome:
 
 ```bash
-cd ~/reference
-awk '{print $1}' GRCh38.p12.genome.fa > GRCh38.p12.genome.clean.fa
-samtools faidx GRCh38.p12.genome.clean.fa
-```
+cd ../trimmed
 
-### Align, sort, index and flagstat
+mkdir ../tophat_out
 
-```bash
-cd fastq_trimmed_nodup
+gtf='../reference/genes.gtf'
+fa='../reference/Bowtie2Index/genome'
 
-mkdir ../bam
-mkdir ../flagstat
-
-ref=~/reference/GRCh38.p12.genome.clean.fa
-
-for fq in *.fastq.gz
+for f in *.trimmed.fq.gz
 do
-  bname=${fq%.fastq.gz}
-  sbatch -J $bname -o ../bam/$bname.log --mem 32G --wrap "bwa aln -t 20 -n 0.06 -q 20 $ref $fq | \
-  bwa samse $ref - $fq | \
-  samtools view -@ 20 -bS - | \
-  samtools sort -@ 20 -T /scratchb/sblab/martin03/tmp/$bname -o ../bam/$bname.bam - && \
-  samtools index ../bam/$bname.bam && \
-  samtools flagstat ../bam/$bname.bam > ../flagstat/$bname.txt"
+  sbatch --mem 16G -J $f -o ../tophat_out/$f.out -e ../tophat_out/$f.err --wrap "tophat -o ../tophat_out/${f}_hg19 -p 8 --library-type fr-unstranded -G $gtf $fa $f"
 done
 ```
 
-### Filter duplicates, sort and index
+
+## Count reads in genes
 
 ```bash
-cd bam
+cd ../tophat_out
 
-ref=~/reference/GRCh38.p12.genome.clean.fa.fai
+mkdir merged_counts
+
+gtf='../reference/genes.gtf'
 
 for bam in *.bam
 do
-  bname=${bam%.bam}
-  nohup samtools view -@ 20 -F 4 $bam | \
-  awk 'BEGIN {FS="\t|_"}; {print $4 "_" $5 "_" $2 "_" $3 "\t" $0}' | \
-  sort -k 1,1 | \
-  awk -F "\t" '!_[$1]++' | \
-  cut -f 1 --complement | \
-  samtools view -@ 20 -bS -t $ref - | \
-  samtools sort -@ 20 -T /scratchb/sblab/martin03/tmp/$bname -o $bname.clean.bam - &
+	bname=${bam%.bam}
+	sbatch -J $bname -o merged_counts/$bname.log --mem 16G --wrap "htseq-count -f bam -r name -s no -t exon -i gene_id -m intersection-strict $bam $gtf > merged_counts/$bname.htseq"
 done
+```
 
-for bam in *.clean.bam
-do
-  nohup samtools index $bam &
-done
+
+## Visualization
+
+```r
+library(data.table)
+library(ggplot2)
+library(edgeR)
+library(ggfortify)
+library(ggrepel)
+library(biomaRt)
+library(gridExtra)
+library(limma)
+
+setwd("~/")
+
+# gets gene symbol, transcript_id and go_id for all genes annotated with ribosomal Go terms
+ensembl = useMart("ensembl", dataset="hsapiens_gene_ensembl") # uses human ensembl annotations
+gene.data <- getBM(attributes = c('hgnc_symbol', 'ensembl_transcript_id', 'go_id'), filters = 'go', values = c('GO:0022625','GO:0022627'), mart = ensembl)
+go_ribosome <- unique(gene.data$hgnc_symbol)
+remove(ensembl, gene.data)
+
+# read in table
+cnt <- fread('./tableCat.py -i tophat_out/merged_counts/*.htseq')
+setnames(cnt, names(cnt), c('gene_id', 'count', 'library_id'))
+raw.data <- data.frame(dcast.data.table(data = cnt, gene_id ~ library_id, value.var = 'count'))
+names(raw.data) <- gsub(".genes.htseq", "", names(raw.data))
+names(raw.data) <- sapply(strsplit(names(raw.data), "_"), `[`, 3)
+rownames(raw.data) <- raw.data[,1]
+raw.data[,1] <- NULL
+
+# edgeR and limma modelling
+y <- DGEList(counts = raw.data)
+y <- calcNormFactors(y)
+raw.data <- data.frame(cpm(y))
+remove(y, cnt)
+raw.data <- raw.data[rowSums(raw.data) > 1,]
+
+ratios <- data.frame(U_1_ratio=raw.data$AM11/raw.data$AML,U_2_ratio=raw.data$BM11/raw.data$BML,
+                    U_3_ratio=raw.data$CM11/raw.data$CML,P2_1_ratio=raw.data$A211/raw.data$A2L,
+                    P2_2_ratio=raw.data$B211/raw.data$B2L,P2_3_ratio=raw.data$C211/raw.data$C2L,
+                    P10_1_ratio=raw.data$A1011/raw.data$A10L,P10_2_ratio=raw.data$B1011/raw.data$B10L,
+                    P10_3_ratio=raw.data$C1011/raw.data$C10L,row.names=row.names(raw.data))
+
+ratios <- na.omit(ratios)
+ratios <- ratios[is.finite(rowSums(ratios)),]
+
+group <- factor(c("DMSO","DMSO","DMSO","PDS2","PDS2","PDS2","PDS10","PDS10","PDS10"))
+experiment <- factor(c(1,2,3,1,2,3,1,2,3))
+design <- model.matrix(~0+group+experiment)
+design
+fit <- lmFit(ratios, design, group = group)
+plotMDS(fitted(fit))
+contrast.matrix <- makeContrasts(groupPDS2-groupDMSO, groupPDS10-groupDMSO, levels = design)
+fit2 <- contrasts.fit(fit, contrast.matrix)
+fit2 <- eBayes(fit2)
+PDS2 <- topTable(fit2, coef = 1, adjust = "none", number = 1e6, p.value = 1)
+PDS10 <- topTable(fit2, coef = 2, adjust = "none", number = 1e6, p.value = 1)
+
+PDS2$gene_id <- rownames(PDS2)
+rownames(PDS2) <- NULL
+PDS10$gene_id <- rownames(PDS10)
+rownames(PDS10) <- NULL
+labs <- c(paste("down", nrow(PDS2[PDS2$logFC < -0.1375 & PDS2$adj.P.Val < 0.1,]), sep = " = "),
+          paste("up", nrow(PDS2[PDS2$logFC > 0.1375 & PDS2$adj.P.Val < 0.1,]), sep = " = "),
+          paste("down", nrow(PDS10[PDS10$logFC < -0.1375 & PDS10$adj.P.Val < 0.1,]), sep = " = "),
+          paste("up", nrow(PDS10[PDS10$logFC > 0.1375 & PDS10$adj.P.Val < 0.1,]), sep = " = "))
+
+plots <- list(go_ribosome)
+names <- c("Ribosome")
+
+
+# plotting
+ggplot(PDS2) + geom_point(aes(x = logFC, y= -log10(adj.P.Val)),size=0.5, color="grey80") + 
+  geom_point(data=PDS2[PDS2$gene_id %in% plots[[1]],], aes(x = logFC, y= -log10(adj.P.Val)),size = 1, color="red") + 
+  theme_bw(base_family = "Arial", base_size = 12 ) + 
+  scale_x_continuous(limits = c(-2.5, 2.5)) + scale_y_continuous(limits = c(0, 2)) +
+  geom_text_repel(data=PDS2[PDS2$gene_id %in% plots[[1]] & PDS2$adj.P.Val < 0.1 ,],
+                   aes(logFC,-log10(adj.P.Val), label=gene_id) , box.padding = 0.5, size = 4,force=2, 
+                   point.padding = 0.1, segment.color = 'grey20') +
+  xlab("") + ylab("") + theme(axis.text.x=element_text(colour="black"),rect=element_rect(color = "grey99",size = 1),
+                              legend.position = "none")
+
+ggsave("PDS2_ribosome.png",width=4.13,height=3.1,device="png",dpi=600)
+
+
+ggplot(PDS10) + geom_point(aes(x = logFC, y= -log10(adj.P.Val)),size=0.5, color="grey80") + 
+  geom_point(data=PDS10[PDS10$gene_id %in% plots[[1]],], aes(x = logFC, y= -log10(adj.P.Val)),size = 1, color="red") + 
+  theme_bw(base_family = "Arial") + 
+  scale_x_continuous(limits = c(-2.5, 2.5)) + scale_y_continuous(limits = c(0, 2)) +
+  geom_text_repel(data=PDS10[PDS10$gene_id %in% plots[[1]] & PDS10$adj.P.Val < 0.1,],
+                  aes(logFC,-log10(adj.P.Val), label=gene_id) , box.padding = 0.5, size = 4,force=2, 
+                  point.padding = 0.1, segment.color = 'grey20') +
+  xlab("") + ylab("") + theme(axis.text.x=element_text(colour="black"),rect=element_rect(color = "black",size = 1))
+
+ggsave("PDS10_ribosome.png",width=4.13,height=3.1,device="png",dpi=600)
+
+
+# output tables
+PDS2_list <- PDS2[PDS2$adj.P.Val < 0.1 & PDS2$logFC < -0.1375,]
+PDS10_list <- PDS2[PDS10$adj.P.Val < 0.1 & PDS10$logFC < -0.1375,]
+write.table('PDS2_polysome_down_genes.txt', x = PDS2_list$gene_id, row.names = F, col.names = F, quote = F)
+write.table('all_genes.txt', x = PDS2$gene_id, row.names = F, col.names = F, quote = F)
+write.table('PDS10_polysome_down_genes.txt', x = PDS10_list$gene_id, row.names = F, col.names = F, quote = F)
 ```
