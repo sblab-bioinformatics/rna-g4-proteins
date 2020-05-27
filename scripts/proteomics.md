@@ -21,7 +21,7 @@
 
 ## Data
 
-See (DMSO_PDS_Peptideintensities.xlsx)[../data/DMSO_PDS_Peptideintensities.xlsx]
+See [DMSO_PDS_Peptideintensities.xlsx](../data/DMSO_PDS_Peptideintensities.xlsx)
 
 
 ## Analysis
