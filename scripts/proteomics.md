@@ -9,23 +9,24 @@
 ## Software requirements
 
 - [R v3.5.2](https://www.r-project.org/). Libraries:
-  - [tidyverse]
-  - [data.table v1.10.4](https://cran.r-project.org/web/packages/data.table/index.html)
-  - [ggplot2 v2.2.1](http://ggplot2.org/)
-  - [edgeR v3.16.5](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
-  - [ggfortify v0.4.10](https://cran.r-project.org/web/packages/ggfortify/index.html)
-  - [ggrepel v0.6.5](https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html)
-  - [biomaRt v2.30.0](https://bioconductor.org/packages/release/bioc/html/biomaRt.html)
+  - [tidyverse v1.3.0](https://www.tidyverse.org/)
+  - [pander v0.6.3](https://cran.r-project.org/web/packages/pander/index.html)
+  - [qPLEXanalyzer v1.0.4](https://www.bioconductor.org/packages/release/bioc/html/qPLEXanalyzer.html)
+  - [readxl v1.3.1](https://cran.r-project.org/web/packages/readxl/index.html)
   - [gridExtra v2.2.1](https://cran.r-project.org/web/packages/gridExtra/index.html)
-  - [limma v3.30.11](http://bioconductor.org/packages/release/bioc/html/limma.html)
+  - [biomaRt v2.30.0](https://bioconductor.org/packages/release/bioc/html/biomaRt.html)
+  - [ggplot2 v2.2.1](http://ggplot2.org/)
+  - [ggrepel v0.6.5](https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html)
 
 
 ## Data
 
-See `data/DMSO_PDS_Peptideintensities.xlsx`
+See (DMSO_PDS_Peptideintensities.xlsx)[../data/DMSO_PDS_Peptideintensities.xlsx]
 
 
 ## Analysis
+
+Script created by CRUK bioinformatics core:
 
 ```r
 library(tidyverse)
