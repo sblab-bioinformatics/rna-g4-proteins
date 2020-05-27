@@ -12,8 +12,7 @@ The proteomics raw peptide intensities obtained from Tandem-mass tag mass spectr
 
 Data analyses scripts for HEK293:
 
-- [iCLIP](iclip.md)
+- [iCLIP](scripts/iclip.md)
 - [BG4 RIP-seq]()
-- [Polysome profiling](polysome-profiling.md)
-- [Proteomics](proteomics.md)
-
+- [Polysome profiling](scripts/polysome-profiling.md)
+- [Proteomics](scripts/proteomics.md)
