@@ -88,20 +88,22 @@ MSnset_int <- convertToMSnset( ExpObj = int_tab, metadata =s_sheet, Sequences =1
                                rmMissing=TRUE )
 
 ## Plotting mean intensities
-p1 <- intensityPlot(MSnset_int, title = "Raw peptide intensity distribution")
 MSnset_norm_int <- qPLEXanalyzer::normalizeScaling(MSnset_int,  median)
 
+p1 <- intensityPlot(MSnset_int, title = "Raw peptide intensity distribution")
 p2 <- intensityPlot(MSnset_norm_int, title = "Normalised Peptide intensity distribution")
-
 grid.arrange(p1, p2,ncol = 2, nrow = 1)
+
 
 ## Plotting relative peptide intensity distribution box-plots
 p4 <- rliPlot(MSnset_int, title = "Raw : Relative Peptide intensity")
 p5 <- rliPlot(MSnset_norm_int, title = "Normalised : Relative Peptide intensity")
 grid.arrange(p4, p5, ncol = 2, nrow = 1)
 
+
 ## Calculating summarised protein intensities as sum of all peptide intensities
 MSnset_Summarised <- summarizeIntensities(MSnset_norm_int, sum, anno_tab)
+
 p3 <- intensityPlot(MSnset_Summarised, title = "Summarised intensity distribution")
 grid.arrange(p1, p2, p3, ncol = 3, nrow = 1)
 
@@ -112,9 +114,9 @@ p2 <- hierarchicalPlot(MSnset_norm_int)
 p3 <- hierarchicalPlot(MSnset_Summarised)
 grid.arrange(p1, p2, p3, ncol = 1, nrow = 3)
 
-## Differential analysis
 
-out_path <- '../results'
+## Differential analysis
+out_path <- '../data'
 de_groups <- unique(s_sheet$SampleGroup)
 treat_group <- de_groups[2]
 ref_group <- de_groups[1]
@@ -131,12 +133,14 @@ diffstats <- computeDiffStats(MSnset_Summarised, contrasts=contrasts, batchEffec
 diffexp <- getContrastResults(diffstats=diffstats, contrast=contrasts, writeFile= FALSE)
 diffexp <- diffexp %>% 
   arrange( adj.P.Val )
+
 write.csv( x=diffexp, file=de_out_file_with_path, row.names = F)
 
-#gets gene symbol, transcript_id and go_id for all genes annotated with ribosomal Go terms
-ensembl = useMart("ensembl",dataset="hsapiens_gene_ensembl") #uses human ensembl annotations
+# gets gene symbol, transcript_id and go_id for all genes annotated with ribosomal Go terms
+ensembl = useMart("ensembl", dataset="hsapiens_gene_ensembl") #uses human ensembl annotations
 gene.data <- getBM(attributes=c('hgnc_symbol', 'ensembl_transcript_id', 'go_id'),
                    filters = 'go', values = c('GO:0022625','GO:0022627'), mart = ensembl)
+
 go_ribosome <- unique(gene.data$hgnc_symbol)
 remove(ensembl,gene.data)
 
@@ -145,10 +149,12 @@ ggplot(diffexp) + geom_point(aes(x = log2FC, y= -log10(P.Value)),size=.5, color=
   theme_bw(base_family = "Arial", base_size = 12 ) + xlim(-1.5,1.5) +
   geom_hline(yintercept = 1.3, linetype = "dashed", color = "grey29") + ylim(0,5) + 
   theme(axis.text.x=element_text(colour="black"),rect=element_rect(color = "grey99",size = 1),legend.position = "none") 
-ggsave("../data/PDS_ribosome.png",width=4.13,height=3.1,device="png",dpi=600)
+
+ggsave("../data/PDS_ribosome.png", width=4.13, height=3.1, device="png", dpi=600)
+
 
 ## Write rnk file for GSEA
-path <- '../results'
+path <- '../data'
 
 files_list <- list.files( path = path)
 
