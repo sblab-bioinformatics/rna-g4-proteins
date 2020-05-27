@@ -5,7 +5,7 @@ This repository contains data access and computational analyses for the methods 
 
 All the raw sequencing data have been deposited in the Gene Expression Omnibus (GEO) under accession number XXX
 
-The proteomics raw peptide intensities obtained from Tandem-mass tag mass spectrometry are in Supplementary Data 1 of the manuscript
+The proteomics raw peptide intensities obtained from Tandem-mass tag mass spectrometry are in `data/DMSO_PDS_Peptideintensities.xlsx` and as Supplementary Data in the manuscript
 
 
 ## Code
@@ -14,6 +14,6 @@ Data analyses scripts for HEK293:
 
 - [iCLIP](iclip.md)
 - [BG4 RIP-seq]()
-- [Polysome profiling]()
-- [Proteomics](polysome-profiling.md)
+- [Polysome profiling](polysome-profiling.md)
+- [Proteomics](proteomics.md)
 
