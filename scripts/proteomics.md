@@ -39,7 +39,7 @@ library(ggplot2)
 library(ggrepel)
 
 # format data set and create sample sheet
-set1 <-  read_excel( '../data/DMSO_PDS_Peptideintensities.xlsx', sheet = 1) 
+set1 <-  read_excel( '../data/DMSO_PDS_Peptideintensities.xlsx', sheet = 2) 
 
 names(set1)[c(1:6)] <- c( 'Confidence', 'Sequence', 'Modifications', 'Protein_Groups', 'Proteins', 'Accessions' )
 
