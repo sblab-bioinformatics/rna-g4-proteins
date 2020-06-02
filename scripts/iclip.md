@@ -15,6 +15,8 @@
 - [Binding profiles around PQS](#binding-profiles-around-pqs)
 - [Transcripts analysis](#transcripts-analysis)
 - [Motifs](#motifs)
+- [G4 structural subclasses](#g4-structural-subclasses)
+- [Hierarchical overlap of peaks with genomic features](#hierarchical-overlap-of-peaks-with-genomic-features)
 
 
 ## Software requirements
@@ -887,3 +889,181 @@ do
 done
 ```
 
+
+## G4 structural subclasses
+
+```bash
+cd ~/annotation
+
+ref=~/reference/GRCh38.p12.genome.clean.fa
+
+# Canonical G4s: G3L7
+#GRCh38.p12.genome.clean.g3l7.bed
+
+# Long loops: G3L12
+#GRCh38.p12.genome.clean.g3l12.bed
+
+# Bulges
+nohup fastaRegexFinder.py -f $ref -r '([gG]{1}[aAcCtT]{2,7}[gG]{2,}|[gG]{2}[aAcCtT]{2,7}[gG]{1,})\w{1,7}[gG]{3,}\w{1,7}[gG]{3,}\w{1,7}[gG]{3,}|
+[gG]{3,}\w{1,7}([gG]{1}[aAcCtT]{2,7}[gG]{2,}|[gG]{2}[aAcCtT]{2,7}[gG]{1,})\w{1,7}[gG]{3,}\w{1,7}[gG]{3,}|
+[gG]{3,}\w{1,7}[gG]{3,}\w{1,7}([gG]{1}[aAcCtT]{2,7}[gG]{2,}|[gG]{2}[aAcCtT]{2,7}[gG]{1,})\w{1,7}[gG]{3,}|
+[gG]{3,}\w{1,7}[gG]{3,}\w{1,7}[gG]{3,}\w{1,7}([gG]{1}[aAcCtT]{2,7}[gG]{2,}|[gG]{2}[aAcCtT]{2,7}[gG]{1,})|
+([gG]{1}[aAcCtT]{1}[gG]{2,}|[gG]{2}[aAcCtT]{1,}[gG]{2,}|[gG]{3,})\w{1,7}([gG]{1}[aAcCtT]{1}[gG]{2,}|[gG]{2}[aAcCtT]{1,}[gG]{2,}|[gG]{3,})\w{1,7}([gG]{1}[aAcCtT]{1}[gG]{2,}|[gG]{2}[aAcCtT]{1,}[gG]{2,}|[gG]{3,})\w{1,7}([gG]{1}[aAcCtT]{1}[gG]{2,}|[gG]{2}[aAcCtT]{1,}[gG]{2,}|[gG]{3,})' -q | \
+bedtools sort -i | \
+sed 's/$/&\tbulges/' > GRCh38.p12.genome.clean.bulges.bed &
+
+# 2-tetrads
+#GRCh38.p12.genome.clean.g2l12.bed
+
+## G3L12 - G3L7 ##
+bedtools intersect \
+-a <(bedtools sort -i GRCh38.p12.genome.clean.g3l12.bed | grep "^chr") \
+-b <(bedtools sort -i GRCh38.p12.genome.clean.g3l7.bed | grep "^chr") \
+-v -s > GRCh38.p12.genome.clean.g3l12minusg3l7.bed
+
+## G3L7 and G3L12 ##
+cat <(grep "^chr" GRCh38.p12.genome.clean.g3l7.bed) <(grep "^chr" GRCh38.p12.genome.clean.g3l12minusg3l7.bed) | bedtools sort -i > GRCh38.p12.genome.clean.g3l7.g3l12.bed
+
+## G3L7 and G3L12 - bulges ##
+bedtools intersect \
+-a <(bedtools sort -i GRCh38.p12.genome.clean.bulges.bed | grep "^chr") \
+-b <(bedtools sort -i GRCh38.p12.genome.clean.g3l7.g3l12.bed | grep "^chr") \
+-v -s > GRCh38.p12.genome.clean.g3l7.g3l12minusbulges.bed
+
+## G3L7 and G3L12 and bulges ##
+cat <(grep "^chr" GRCh38.p12.genome.clean.g3l7.g3l12.bed) <(grep "^chr" GRCh38.p12.genome.clean.g3l7.g3l12minusbulges.bed) | bedtools sort -i > GRCh38.p12.genome.clean.g3l7.g3l12.bulges.bed
+
+## G3L7 and G3L12 and bulges - G2L12 ##
+bedtools intersect \
+-a <(bedtools sort -i GRCh38.p12.genome.clean.g2l12.bed | grep "^chr") \
+-b <(bedtools sort -i GRCh38.p12.genome.clean.g3l7.g3l12.bulges.bed | grep "^chr") \
+-v -s > GRCh38.p12.genome.clean.g3l7.g3l12.bulgesminusg2l12.bed
+
+## G3L7 and G3L12 and bulges and G2L12 ##
+cat <(grep "^chr" GRCh38.p12.genome.clean.g3l7.g3l12.bulges.bed) <(grep "^chr" GRCh38.p12.genome.clean.g3l7.g3l12.bulgesminusg2l12.bed) | bedtools sort -i > GRCh38.p12.genome.clean.g3l7.g3l12.bulges.g2l12.bed
+```
+
+### Overlap with G4 structural subclasses
+
+```bash
+cd ~/piranha
+
+for peaks in DHX36_EA.clean.peaks.consensus.bed \
+DHX36_WT.clean.peaks.consensus.bed \
+GRSF1_WT.clean.peaks.consensus.bed \
+DDX3X_WT.clean.peaks.consensus.bed
+do
+  # calc
+  n=`cat $peaks | wc -l`
+  t=`bedtools intersect -a $peaks -b ../annotation/GRCh38.p12.genome.clean.g3l7.g3l12.bulges.g2l12.bed -loj -s | wc -l`
+  c=`bedtools intersect -a $peaks -b ../annotation/GRCh38.p12.genome.clean.g3l7.g3l12.bulges.g2l12.bed -loj -s | cut -f14 | sort | uniq -c`
+  # print
+  echo -e "### $peaks ###\n"
+  echo -e "total number of peaks:\t$n\n"
+  echo -e "total number of overlaps:\t$t"
+  echo -e "$c"
+done
+```
+
+The legend is:
+
+- G3L7 as canonical
+- G3L12 as long loops
+- bulges
+- G2L12 as 2 quartets
+- . as other (none of the above)
+
+
+## Hierarchical overlap of peaks with genomic features
+
+5'UTR > 3'UTR > exons > introns
+
+```bash
+cd ~/piranha
+
+for peaks in DHX36_EA.clean.peaks.consensus.bed \
+DHX36_WT.clean.peaks.consensus.bed \
+GRSF1_WT.clean.peaks.consensus.bed \
+DDX3X_WT.clean.peaks.consensus.bed
+do
+  t1=`cat $peaks | wc -l`
+  echo -e "$peaks\t$t1"
+  o_utr5=`bedtools intersect \
+  -a $peaks \
+  -b ../annotation/gencode.v28.annotation.sorted.transcript_utr5.bed \
+  -wa -u -s | wc -l`
+  o_utr3=`bedtools intersect \
+  -a <(bedtools intersect -a $peaks -b ../annotation/gencode.v28.annotation.sorted.transcript_utr5.bed -v -s) \
+  -b ../annotation/gencode.v28.annotation.sorted.transcript_utr3.bed \
+  -wa -u -s | wc -l`
+  o_exons=`bedtools intersect \
+  -a <(bedtools intersect -a <(bedtools intersect -a $peaks -b ../annotation/gencode.v28.annotation.sorted.transcript_utr5.bed -v -s) -b ../annotation/gencode.v28.annotation.sorted.transcript_utr3.bed -v -s) \
+  -b ../annotation/gencode.v28.annotation.sorted.transcript_exons.bed \
+  -wa -u -s | wc -l`
+  o_introns=`bedtools intersect \
+  -a <(bedtools intersect -a <(bedtools intersect -a <(bedtools intersect -a $peaks -b ../annotation/gencode.v28.annotation.sorted.transcript_utr5.bed -v -s) -b ../annotation/gencode.v28.annotation.sorted.transcript_utr3.bed -v -s) -b ../annotation/gencode.v28.annotation.sorted.transcript_exons.bed -v -s) \
+  -b ../annotation/gencode.v28.annotation.sorted.transcript_introns.bed \
+  -wa -u -s | wc -l`
+  o_other=`bedtools intersect \
+  -a <(bedtools intersect -a <(bedtools intersect -a <(bedtools intersect -a $peaks -b ../annotation/gencode.v28.annotation.sorted.transcript_utr5.bed -v -s) -b ../annotation/gencode.v28.annotation.sorted.transcript_utr3.bed -v -s) -b ../annotation/gencode.v28.annotation.sorted.transcript_exons.bed -v -s) \
+  -b ../annotation/gencode.v28.annotation.sorted.transcript_introns.bed \
+  -v -s | wc -l`
+  pct_utr5=`echo "scale=1; 100*$o_utr5/$t1" | bc`
+  pct_utr3=`echo "scale=1; 100*$o_utr3/$t1" | bc`
+  pct_exons=`echo "scale=1; 100*$o_exons/$t1" | bc`
+  pct_introns=`echo "scale=1; 100*$o_introns/$t1" | bc`
+  pct_other=`echo "scale=1; 100*$o_other/$t1" | bc`
+  echo -e "gencode.v28.annotation.sorted.transcript_utr5.bed\t$o_utr5\t$pct_utr5%"
+  echo -e "gencode.v28.annotation.sorted.transcript_utr3.bed\t$o_utr3\t$pct_utr3%"
+  echo -e "gencode.v28.annotation.sorted.transcript_exons.bed\t$o_exons\t$pct_exons%"
+  echo -e "gencode.v28.annotation.sorted.transcript_introns.bed\t$o_introns\t$pct_introns%"
+  echo -e "other\t$o_other\t$pct_other%"
+  echo -e "----------"
+done | column -t
+```
+
+Plotting:
+
+```r
+library(data.table)
+library(ggplot2)
+
+# Enlarge the view width when printing tables
+options(width = 400)
+
+
+# Barplot percentage peak overlap
+# Load data
+data <- data.table(library = c("DHX36", "DHX36", "DHX36", "DHX36", "DHX36", "GRSF1", "GRSF1", "GRSF1", "GRSF1", "GRSF1", "DDX3X", "DDX3X", "DDX3X", "DDX3X", "DDX3X"), annotation = c("5'UTR", "3'UTR", "exons", "introns", "other", "5'UTR", "3'UTR", "exons", "introns", "other", "5'UTR", "3'UTR", "exons", "introns", "other"), pct_overlap = c(15.7, 42.6, 23.9, 5.1, 12.5, 7.5, 24.3, 15.4, 16.4, 36.1, 47.8, 6.8, 29.2, 4.6, 11.3))
+
+data$library <- factor(data$library, levels = c("DHX36", "GRSF1", "DDX3X"))
+data$annotation <- factor(data$annotation, levels = c("5'UTR", "3'UTR", "exons", "introns", "other"))
+
+gg <- ggplot(data, aes(x=annotation, y=pct_overlap, fill=library)) +
+geom_bar(stat="identity", color="black", position=position_dodge(), alpha = 0.5) +
+theme_classic() +
+ylab("% peak overlap") +
+xlab("") +
+theme(legend.title = element_blank(), axis.title = element_text(size=16), axis.text.y = element_text(size=16, color = "black"), axis.text.x = element_text(angle = 45, size = 16, color = "black", hjust = 1), legend.text = element_text(size = 16, color = "black")) +
+scale_fill_manual(values = c("darkgoldenrod", "deepskyblue3", "seagreen4"), labels = c("DHX36", "GRSF1", "DDX3X")) +
+coord_cartesian(ylim = c(0, 50))
+ggsave("~/figures/pct_peak_overlap.pdf", width = 14, height = 14, units= 'cm')
+
+
+# Barplot peak count overlap
+# Load data
+data <- data.table(library = c("DHX36", "DHX36", "DHX36", "DHX36", "DHX36", "GRSF1", "GRSF1", "GRSF1", "GRSF1", "GRSF1", "DDX3X", "DDX3X", "DDX3X", "DDX3X", "DDX3X"), annotation = c("5'UTR", "3'UTR", "exons", "introns", "other", "5'UTR", "3'UTR", "exons", "introns", "other", "5'UTR", "3'UTR", "exons", "introns", "other"), count_overlap = c(1719, 4640, 2610, 557, 1365, 1249, 4031, 2564, 2732, 5995, 2182, 312, 1333, 213, 517))
+
+data$library <- factor(data$library, levels = c("DHX36", "GRSF1", "DDX3X"))
+data$annotation <- factor(data$annotation, levels = c("5'UTR", "3'UTR", "exons", "introns", "other"))
+
+gg <- ggplot(data, aes(x=annotation, y=count_overlap, fill=library)) +
+geom_bar(stat="identity", color="black", position=position_dodge(), alpha = 0.5) +
+theme_classic() +
+ylab("peak count overlap") +
+xlab("") +
+theme(legend.title = element_blank(), axis.title = element_text(size=16), axis.text.y = element_text(size=16, color = "black"), axis.text.x = element_text(angle = 45, size = 16, color = "black", hjust = 1), legend.text = element_text(size = 16, color = "black")) +
+scale_fill_manual(values = c("darkgoldenrod", "deepskyblue3", "seagreen4"), labels = c("DHX36", "GRSF1", "DDX3X")) +
+coord_cartesian(ylim = c(0, 6000))
+ggsave("~/figures/peak_count_overlap.pdf", width = 14, height = 14, units= 'cm')
+```
