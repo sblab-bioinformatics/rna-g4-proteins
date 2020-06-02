@@ -4,6 +4,7 @@
 - [Software requirements](#software-requirements)
 - [Data](#data)
 - [Analysis](#analysis)
+- [GSEA](#gsea)
 
 
 ## Software requirements
@@ -170,3 +171,8 @@ for(each_file in files_list[grep('csv', files_list)]){
   write.table( file=out_file, x=tab, col.names = F, row.names = F, sep='\t', quote = F)
 }
 ```
+
+
+## GSEA
+
+[GSEA.sh](GSEA.sh)
