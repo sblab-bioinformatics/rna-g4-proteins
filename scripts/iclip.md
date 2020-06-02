@@ -6,6 +6,7 @@
 - [Trim illumina adapters and quality trimming](#trim-illumina-adapters-and-quality-trimming)
 - [Remove duplicates and reads with stretches of several identical nucleotides](#remove-duplicates-and-reads-with-stretches-of-several-identical-nucleotides)
 - [Alignment](#alignment)
+- [Genomic signal correlation](#genomic-signal-correlation)
 
 
 ## Software requirements
@@ -14,7 +15,9 @@
 - Standard Unix tools: cat, awk, sort, uniq, paste, grep, pigz, cut, sbatch, nohup
 - [bwa v0.7.15-r1140](http://bio-bwa.sourceforge.net/)
 - [samtools v1.3.1](http://samtools.sourceforge.net/)
-- [sambamba v0.6.5](https://academic.oup.com/bioinformatics/article/31/12/2032/214758)
+- [deeptools v3.3.0](https://deeptools.readthedocs.io/en/develop/)
+
+
 - [igvtools v2.3.91](https://software.broadinstitute.org/software/igv/igvtools)
 - [bedtools v2.27.0](http://bedtools.readthedocs.io/en/latest/)
 - [tableCat.py](https://github.com/dariober/bioinformatics-cafe/blob/master/tableCat/tableCat.py)
@@ -97,6 +100,8 @@ done
 
 ### Prepare reference genome
 
+Human reference genome and annotations downloaded from [GENCODE](https://www.gencodegenes.org/)
+
 ```bash
 cd ~/reference
 awk '{print $1}' GRCh38.p12.genome.fa > GRCh38.p12.genome.clean.fa
@@ -119,7 +124,7 @@ do
   sbatch -J $bname -o ../bam/$bname.log --mem 32G --wrap "bwa aln -t 20 -n 0.06 -q 20 $ref $fq | \
   bwa samse $ref - $fq | \
   samtools view -@ 20 -bS - | \
-  samtools sort -@ 20 -T /scratchb/sblab/martin03/tmp/$bname -o ../bam/$bname.bam - && \
+  samtools sort -@ 20 -T ~/tmp/$bname -o ../bam/$bname.bam - && \
   samtools index ../bam/$bname.bam && \
   samtools flagstat ../bam/$bname.bam > ../flagstat/$bname.txt"
 done
@@ -141,7 +146,7 @@ do
   awk -F "\t" '!_[$1]++' | \
   cut -f 1 --complement | \
   samtools view -@ 20 -bS -t $ref - | \
-  samtools sort -@ 20 -T /scratchb/sblab/martin03/tmp/$bname -o $bname.clean.bam - &
+  samtools sort -@ 20 -T ~/tmp/$bname -o $bname.clean.bam - &
 done
 
 for bam in *.clean.bam
@@ -149,3 +154,44 @@ do
   nohup samtools index $bam &
 done
 ```
+
+
+## Genomic signal correlation
+
+### deeptools
+
+multiBamSummary and plotCorrelation:
+
+```bash
+cd bam
+
+mkdir ../deeptools
+
+nohup multiBamSummary bins -b DHX36_WT1.clean.bam \
+DHX36_WT2.clean.bam \
+DHX36_WT3.clean.bam \
+GRSF1_WT1.clean.bam \
+GRSF1_WT2.clean.bam \
+GRSF1_WT3.clean.bam \
+GRSF1_WT4.clean.bam \
+DDX3X_WT1.clean.bam \
+DDX3X_WT2.clean.bam \
+DDX3X_WT3.clean.bam \
+-out ../deeptools/DXH36_WT.GRSF1_WT.DDX3X_WT.genome.bins.npz \
+-l DHX36_WT_rep1 DHX36_WT_rep2 DHX36_WT_rep3 GRSF1_WT_rep1 GRSF1_WT_rep2 GRSF1_WT_rep3 GRSF1_WT_rep4 DDX3X_WT_rep1 DDX3X_WT_rep2 DDX3X_WT_rep3 \
+-p "max" > ../deeptools/DXH36_WT.GRSF1_WT.DDX3X_WT.genome.bins.log &
+
+cd ../deeptools/
+
+nohup plotCorrelation -in DXH36_WT.GRSF1_WT.DDX3X_WT.genome.bins.npz \
+-o DXH36_WT.GRSF1_WT.DDX3X_WT.genome.bins_pearson_heatmap.png \
+-c pearson \
+-p heatmap \
+-l "DHX36_WT_rep1" "DHX36_WT_rep2" "DHX36_WT_rep3" "GRSF1_WT_rep1" "GRSF1_WT_rep2" "GRSF1_WT_rep3" "GRSF1_WT_rep4" "DDX3X_WT_rep1" "DDX3X_WT_rep2" "DDX3X_WT_rep3" \
+--removeOutliers \
+--colorMap Reds \
+--plotNumbers > DXH36_WT.GRSF1_WT.DDX3X_WT.genome.bins_pearson_heatmap.log &
+```
+
+
+
