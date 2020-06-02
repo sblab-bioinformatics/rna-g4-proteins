@@ -13,6 +13,8 @@
 - [GAT](#gat)
 - [Overlap with genomic features and PQS](#overlap-with-genomic-features-and-pqs)
 - [Binding profiles around PQS](#binding-profiles-around-pqs)
+- [Transcripts analysis](#transcripts-analysis)
+- [Motifs](#motifs)
 
 
 ## Software requirements
@@ -27,6 +29,8 @@
 - [tableCat.py](https://github.com/dariober/bioinformatics-cafe/blob/master/tableCat/tableCat.py)
 - [fastaRegexFinder.py v0.1.1](https://github.com/dariober/bioinformatics-cafe/tree/master/fastaRegexFinder)
 - [gat-run.py](http://gat.readthedocs.io/en/latest/contents.html)
+- [meme suite v4.11.2](http://meme-suite.org/)
+- [Python v2.7.12](https://www.python.org/)
 - [R v3.3.2](https://www.r-project.org/). Libraries:
   - [VennDiagram v1.6.20](https://cran.r-project.org/web/packages/VennDiagram/index.html)
   - [data.table v1.10.4](https://cran.r-project.org/web/packages/data.table/index.html)
@@ -717,3 +721,169 @@ do
   plotProfile -m ../deeptools/$bname.mat.gz -o ../deeptools/20190704_$bname.png --dpi 300 --plotHeight 9 --plotWidth 10 --plotType 'se' --numPlotsPerRow 2 --startLabel 's' --endLabel 'e' --regionsLabel 'G3L7' 'G3L12' 'G2L7' 'G2L12' --samplesLabel '' --plotTitle $bname --colors 'black' 'black' 'black' 'black' -y 'CPM' --legendLocation none --perGroup"
 done
 ```
+
+
+## Transcripts analysis
+
+### Parsing gff
+
+```python
+ifile = open("~/annotation/gencode.v28.annotation.sorted.gtf")
+ilines = ifile.readlines()
+ifile.close()
+
+ofile = open("~/annotation/gencode.v28.annotation.sorted.transcripts.type.bed", "w")
+
+for l in ilines:
+  if not l.startswith("##"):
+    fields = l.split("\t")
+    if fields[2] == "transcript":
+      chr = fields[0]
+      start = fields[3]
+      end = fields[4]
+      strand = fields[6]
+      annotations = fields[8].split(";")[:-1]
+      gene_id = [a.split('"')[1] for a in annotations if a.startswith("gene_id")][0]
+      transcript_id = [a.split('"')[1] for a in annotations if a.startswith(" transcript_id")][0]
+      transcript_type = [a.split('"')[1] for a in annotations if a.startswith(" transcript_type")][0]
+      ofile.write("\t".join([chr, start, end, transcript_id, gene_id, strand, transcript_type])+"\n")
+
+ofile.close()
+```
+
+### Overlap with annotated transcripts
+
+```bash
+cd ~/piranha
+
+for peaks in DHX36_EA.clean.peaks.consensus.bed \
+DHX36_WT.clean.peaks.consensus.bed \
+GRSF1_WT.clean.peaks.consensus.bed \
+DDX3X_WT.clean.peaks.consensus.bed
+do
+  # calc
+  n=`cat $peaks | wc -l`
+  t=`bedtools intersect -a $peaks -b ../annotation/gencode.v28.annotation.sorted.transcripts.type.bed -loj -s | wc -l`
+  c=`bedtools intersect -a $peaks -b ../annotation/gencode.v28.annotation.sorted.transcripts.type.bed -loj -s | awk '$13 == "protein_coding" || $13 == "retained_intron" || $13 == "nonsense_mediated_decay" || $13 == "processed_transcript"' | wc -l`
+  c_pct=`echo "scale=1; 100*$c/$t" | bc`
+  nc=`bedtools intersect -a $peaks -b ../annotation/gencode.v28.annotation.sorted.transcripts.type.bed -loj -s | awk '$7 != "." && $13 != "protein_coding" && $13 != "retained_intron" && $13 != "nonsense_mediated_decay" && $13 != "processed_transcript"' | wc -l`
+  nc_pct=`echo "scale=1; 100*$nc/$t" | bc`
+  o=`bedtools intersect -a $peaks -b ../annotation/gencode.v28.annotation.sorted.transcripts.type.bed -loj -s | awk '$7 == "."' | wc -l`
+  o_pct=`echo "scale=1; 100*$o/$t" | bc`
+  nc_types=`bedtools intersect -a $peaks -b ../annotation/gencode.v28.annotation.sorted.transcripts.type.bed -loj -s | awk '$7 != "." && $13 != "protein_coding" && $13 != "retained_intron" && $13 != "nonsense_mediated_decay" && $13 != "processed_transcript"' | cut -f13 | sort | uniq -c | sort -k1,1nr`
+  # print
+  echo -e "### $peaks ###\n"
+  echo -e "total number of peaks:\t$n\n"
+  echo -e "total number of binding sites:\t$t"
+  echo -e "\t- coding:\t$c\t($c_pct%)"
+  echo -e "\t- non-coding:\t$nc\t($nc_pct%)"
+  echo -e "\t- other:\t$o\t($o_pct%)\n"
+  echo -e "most common non-coding binding sites are:"
+  echo -e "$nc_types"
+  echo -e "-----------------------------------------\n"
+done
+```
+
+
+## Motifs
+
+### Overlap
+
+```bash
+cd ~/piranha
+
+# 5'UTR
+for bed in *.clean.peaks.consensus.bed
+do
+  bname=${bed%.bed}
+  nohup bedtools intersect \
+  -a $bed \
+  -b ~/annotation/gencode.v28.annotation.sorted.transcript_utr5.bed \
+  -wa -u > $bname.utr5.bed &  
+done
+
+# 3'UTR
+for bed in *.clean.peaks.consensus.bed
+do
+  bname=${bed%.bed}
+  nohup bedtools intersect \
+  -a $bed \
+  -b ~/annotation/gencode.v28.annotation.sorted.transcript_utr3.bed \
+  -wa -u > $bname.utr3.bed &  
+done
+```
+
+### dreme
+
+Create fasta files:
+
+```bash
+cd ~/piranha
+
+mkdir ../dreme
+
+g=~/reference/GRCh38.p12.genome.clean.fa
+
+# bed files
+for bed in *.clean.peaks.consensus*.bed
+do
+  bname=${bed%.bed}
+  echo $bname
+  nohup bedtools sort -i $bed | \
+  bedtools getfasta -fi $g -bed - -s > ../dreme/$bname.fasta &
+  nohup bedtools sort -i $bed | \
+  bedtools shuffle -i - -g <(grep '^chr' $g.fai) -seed 123 -incl ../annotation/gencode.v28.annotation.sorted.genes.bed | \
+  bedtools getfasta -fi $g -bed - > ../dreme/$bname.shuffle.fasta &
+done
+```
+
+Run dreme with negative sequences:
+
+```bash
+cd ~/dreme
+
+mkdir run_neg
+
+for k in 8 10 15 20 25 30
+do
+  mkdir $k
+  for fasta in `ls *.fasta | grep -v "shuffle"`
+  do
+    bname=${fasta%.fasta}
+    sbatch -J $k.${bname} -o run_neg/${k}/${bname}.log --mem 32G --wrap "dreme -oc run_neg/${k}/${bname} -p $fasta -n $bname.shuffle.fasta -rna -norc -s 123 -png -maxk $k"
+  done
+done
+```
+
+Run dreme with scrambled negative sequences:
+
+```bash
+cd ~/dreme
+
+mkdir -p run_scr
+
+for k in 8 10 15 20 25 30
+do
+  mkdir run_scr/$k
+  for fasta in `ls *.fasta | grep -v "shuffle"`
+  do
+    bname=${fasta%.fasta}
+    sbatch -J $k.${bname} -o run_scr/${k}/${bname}.log --mem 32G --wrap "dreme -oc run_scr/${k}/${bname} -p $fasta -rna -norc -s 123 -png -maxk $k"
+  done
+done
+```
+
+### meme-chip
+
+```bash
+cd ~/dreme
+
+mkdir ../meme-chip
+
+for fasta in `ls *.fasta | grep -v "shuffle"`
+do
+  bname=${fasta%.fasta}
+  sbatch -J ${bname} -o ../meme-chip/${bname}.log --mem 32G --wrap "meme-chip -oc ../meme-chip/${bname} -neg $bname.shuffle.fasta -seed 123 -norc -spamo-skip -fimo-skip $fasta"
+done
+```
+
