@@ -253,5 +253,5 @@ bedtools intersect -a BG4.clean.ext.bed -b table_bg4vsinput -wo | cut -f 1-3,7,8
 bedtools intersect \
 -a <(awk '$4 > 0.8 {print $0}' table_bg4vsinput.stranded.ext.bed | bedtools sort -i) \
 -b <(awk '$4 > 0.8 {print $0}' table_a9vsinput.bed | bedtools sort -i) \
--v > .bed
+-v > BG4.peaks.bed
 ```
