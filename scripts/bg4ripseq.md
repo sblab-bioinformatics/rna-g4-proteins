@@ -227,8 +227,31 @@ Further filtering and keep BG4 - A9 only:
 ```bash
 cd ~/bedgraph
 
+awk '{print $1":"$2"-"$3}' table_bg4vsinput.bed > chr
+
+while read p
+do samtools view ../bam/BG4.clean.bam $p |\
+gawk '{if (and($2, 16)) {cnt_reverse++} else {cnt_forward++}}END{if (cnt_forward>cnt_reverse) {print "-"} else {print "+"}}' >> tmp
+done <chr
+
+# removing PValue from the last column and replacing with strand information
+cut -f 1-5 table_bg4vsinput.bed | paste - tmp > table_bg4vsinput.stranded.bed
+
+### This expands the differentially called peaks to the nearby regions when there is adjacent signal #####
+
+# Reading bedgraph to determine areas with signal > 0.1 cpm and define multi2's
+
+cd ~/bedgraph
+for bdg in BG4_*.bedgraph; do   bname=${bdg%.bedgraph};  nohup awk '{if($4 >= 0.1){print $0}}' $bdg | sort -k1,1 -k2,2n | bedtools merge -i - | awk '{if(($3-$2)>=50){print $0}}'> $bname.ext.bed & done
+
+bedtools multiinter -i BG4_*.ext.bed | awk '$4>=2' | bedtools sort -i - | bedtools merge -i - > BG4.clean.ext.bed
+
+bedtools intersect -a BG4.clean.ext.bed -b table_bg4vsinput -wo | cut -f 1-3,7,8,9 > table_bg4vsinput.stranded.ext.bed
+
+###Remove A9 peaks
+
 bedtools intersect \
--a <(awk '$4 > 0.8 {print $0}' table_bg4vsinput.bed | bedtools sort -i) \
+-a <(awk '$4 > 0.8 {print $0}' table_bg4vsinput.stranded.ext.bed | bedtools sort -i) \
 -b <(awk '$4 > 0.8 {print $0}' table_a9vsinput.bed | bedtools sort -i) \
--v > bg4_rip-seq.bed
+-v > .bed
 ```
