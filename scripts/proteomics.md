@@ -3,6 +3,7 @@
 
 - [Software requirements](#software-requirements)
 - [Data](#data)
+- [Acknowledgement](#acknowledgement)
 - [Analysis](#analysis)
 - [GSEA](#gsea)
 
@@ -25,9 +26,12 @@
 See [DMSO_PDS_Peptideintensities.xlsx](../data/DMSO_PDS_Peptideintensities.xlsx)
 
 
-## Analysis
+## Acknowledgement
 
-Original script created by Chandra Sekhar Reddy Chilamakuri (Chandra.Chilamakuri@cruk.cam.ac.uk) from the CRUK-CI bioinformatics core:
+The original analysis R script was created by Chandra Sekhar Reddy Chilamakuri (Chandra.Chilamakuri@cruk.cam.ac.uk) from the CRUK-CI bioinformatics core.
+
+
+## Analysis
 
 ```r
 library(tidyverse)
