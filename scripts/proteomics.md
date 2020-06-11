@@ -27,7 +27,7 @@ See [DMSO_PDS_Peptideintensities.xlsx](../data/DMSO_PDS_Peptideintensities.xlsx)
 
 ## Analysis
 
-Script created by CRUK bioinformatics core:
+Original script created by Chandra Sekhar Reddy Chilamakuri (Chandra.Chilamakuri@cruk.cam.ac.uk) from the CRUK-CI bioinformatics core:
 
 ```r
 library(tidyverse)
