@@ -6,6 +6,7 @@
 - [Trim illumina adapters and quality trimming](#trim-illumina-adapters-and-quality-trimming)
 - [Alignment](#alignment)
 - [Genomic signal normalization](#genomic-signal-normalization)
+- [Merge bam files](#merge-bam-files)
 - [Peak calling](#peak-calling)
 
 
@@ -133,6 +134,15 @@ do
   bname=${bam%.bam}
   sbatch -J $bname -o ../bedgraph/$bname.log --mem 32G --wrap "bamCoverage -b $bam -o ../bedgraph/$bname.bedgraph -of bedgraph --binSize 1 -p 20 --normalizeUsing CPM"
 done
+```
+
+
+## Merge bam files
+
+```bash
+cd ~/bam
+samtools merge -@ 20 BG4.clean.bam BG4_*.clean.bam
+samtools index BG4.clean.bam
 ```
 
 
