@@ -466,8 +466,8 @@ library(ggplot2)
 options(width = 400)
 
 # Load data
-data <- fread("tableCat.py -i ~/gat/*.genes.txt -S 1 -r .clean.peaks.consensus.genes.txt | cut -f2-4,8-12,15,18,21-25")
-setnames(data, c("annotation", "observed", "expected", "fold", "l2fold", "pvalue", "qvalue", "track_nsegments", "annotation_nsegments", "overlap_nsegments", "percent_overlap_nsegments_track", "percent_overlap_size_track", "percent_overlap_nsegments_annotation", "percent_overlap_size_annotation", "library"))
+data <- fread("tableCat.py -i ~/gat/*.transcripts.txt -S 1 -r .clean.peaks.consensus.transcripts.txt | cut -f2-6,8-12,15,18,21-25")
+setnames(data, c("annotation", "observed", "expected", "CI95low", "CI95high", "fold", "l2fold", "pvalue", "qvalue", "track_nsegments", "annotation_nsegments", "overlap_nsegments", "percent_overlap_nsegments_track", "percent_overlap_size_track", "percent_overlap_nsegments_annotation", "percent_overlap_size_annotation", "library"))
 
 
 # Boxplot all
@@ -475,14 +475,14 @@ data_selected <- data[annotation %in% c("5UTR", "exon", "intron", "3UTR", "G2L7"
 data_selected$annotation <- factor(data_selected$annotation, levels = c("5UTR", "exon", "intron", "3UTR", "G2L7", "G3L7"))
 data_selected$library <- factor(data_selected$library, levels = c("DHX36_EA", "DHX36_WT", "GRSF1_WT", "DDX3X_WT"))
 
-gg <- ggplot(data_selected, aes(x=annotation, y=l2fold, fill=library)) +
+gg <- ggplot(data_selected, aes(x=annotation, y=fold, fill=library)) +
 geom_bar(stat="identity", color="black", position=position_dodge(), alpha = 0.5) +
 theme_classic() +
-ylab(expression("log"[2]*"FC")) +
+ylab("Fold Change) +
 xlab("") +
 theme(legend.title = element_blank(), axis.title = element_text(size=16), axis.text.y = element_text(size=16, color = "black"), axis.text.x = element_text(angle = 45, size = 16, color = "black", hjust = 1), legend.text = element_text(size = 16, color = "black")) +
 scale_fill_manual(values = c("darkgoldenrod1", "darkgoldenrod", "deepskyblue3", "seagreen3", "seagreen4"), labels = c("DHX36 EA", "DHX36 WT", "GRSF1 WT", "DDX3X_WT")) +
-coord_cartesian(ylim = c(-2, 6))
+geom_errorbar(aes(ymin=observed/CI95low,ymax=observed/CI95high),position=position_dodge(0.9),width=0.2)
 ggsave("~/figures/dhx36_grsf1_ddx3x_gat.pdf", width = 20, height = 14, units= 'cm')
 
 
@@ -493,14 +493,14 @@ data_genomic_dhx36[annotation == "3UTR", annotation := "3'UTR"]
 data_genomic_dhx36$annotation <- factor(data_genomic_dhx36$annotation, levels = c("5'UTR", "exon", "intron", "3'UTR"))
 data_genomic_dhx36$library <- factor(data_genomic_dhx36$library, levels = c("DHX36_EA", "DHX36_WT"))
 
-gg <- ggplot(data_genomic_dhx36, aes(x=annotation, y=l2fold, fill=library)) +
+gg <- ggplot(data_genomic_dhx36, aes(x=annotation, y=fold, fill=library)) +
 geom_bar(stat="identity", color="black", position=position_dodge(), alpha = 0.5) +
 theme_classic() +
-ylab(expression("log"[2]*"FC")) +
+ylab("Fold Change") +
 xlab("") +
 theme(legend.title = element_blank(), axis.title = element_text(size=16), axis.text.y = element_text(size=16, color = "black"), axis.text.x = element_text(angle = 45, size = 16, color = "black", hjust = 1), legend.text = element_text(size = 16, color = "black")) +
 scale_fill_manual(values = c("darkgoldenrod1", "darkgoldenrod"), labels = c("EA", "WT")) +
-coord_cartesian(ylim = c(-2, 5))
+geom_errorbar(aes(ymin=observed/CI95low,ymax=observed/CI95high),position=position_dodge(0.9),width=0.2)
 ggsave("~/figures/dhx36_genomic_gat.pdf", width = 10, height = 10, units= 'cm')
 
 
@@ -508,14 +508,14 @@ ggsave("~/figures/dhx36_genomic_gat.pdf", width = 10, height = 10, units= 'cm')
 data_pqs_dhx36 <- data[annotation %in% c("G2L7", "G3L7") & library %in% c("DHX36_EA", "DHX36_WT")]
 data_pqs_dhx36$library <- factor(data_pqs_dhx36$library, levels = c("DHX36_EA", "DHX36_WT"))
 
-gg <- ggplot(data_pqs_dhx36, aes(x=annotation, y=l2fold, fill=library)) +
+gg <- ggplot(data_pqs_dhx36, aes(x=annotation, y=fold, fill=library)) +
 geom_bar(stat="identity", color="black", position=position_dodge(), alpha = 0.5) +
 theme_classic() +
-ylab(expression("log"[2]*"FC")) +
+ylab("Fold Change") +
 xlab("") +
 theme(legend.title = element_blank(), axis.title = element_text(size=16), axis.text.y = element_text(size=16, color = "black"), axis.text.x = element_text(angle = 45, size = 16, color = "black", hjust = 1), legend.text = element_text(size = 16, color = "black")) +
 scale_fill_manual(values = c("darkgoldenrod1", "darkgoldenrod"), labels = c("EA", "WT")) +
-coord_cartesian(ylim = c(-2, 5))
+geom_errorbar(aes(ymin=observed/CI95low,ymax=observed/CI95high),position=position_dodge(0.9),width=0.2)
 ggsave("~/figures/dhx36_pqs_gat.pdf", width = 8, height = 10, units= 'cm')
 
 
@@ -525,28 +525,28 @@ data_genomic_grsf1[annotation == "5UTR", annotation := "5'UTR"]
 data_genomic_grsf1[annotation == "3UTR", annotation := "3'UTR"]
 data_genomic_grsf1$annotation <- factor(data_genomic_grsf1$annotation, levels = c("5'UTR", "exon", "intron", "3'UTR"))
 
-gg <- ggplot(data_genomic_grsf1, aes(x=annotation, y=l2fold, fill=library)) +
+gg <- ggplot(data_genomic_grsf1, aes(x=annotation, y=fold, fill=library)) +
 geom_bar(stat="identity", color="black", position=position_dodge(), alpha = 0.5, show.legend = FALSE) +
 theme_classic() +
-ylab(expression("log"[2]*"FC")) +
+ylab("Fold Change") +
 xlab("") +
 theme(legend.title = element_blank(), axis.title = element_text(size=16), axis.text.y = element_text(size=16, color = "black"), axis.text.x = element_text(angle = 45, size = 16, color = "black", hjust = 1), legend.text = element_text(size = 16, color = "black")) +
 scale_fill_manual(values = c("deepskyblue3")) +
-coord_cartesian(ylim = c(-2, 5))
-ggsave("~/figures/grsf1_genomic_gat.pdf", width = 7, height = 10, units= 'cm')
+geom_errorbar(aes(ymin=observed/CI95low,ymax=observed/CI95high),position=position_dodge(0.9),width=0.2)
+ggsave("~/figures/grsf1_transcript_gat.pdf", width = 7, height = 10, units= 'cm')
 
 
 # Boxplot PQS GRSF1 WT
 data_pqs_grsf1 <- data[annotation %in% c("G2L7", "G3L7") & library %in% c("GRSF1_WT")]
 
-gg <- ggplot(data_pqs_grsf1, aes(x=annotation, y=l2fold, fill=library)) +
+gg <- ggplot(data_pqs_grsf1, aes(x=annotation, y=fold, fill=library)) +
 geom_bar(stat="identity", color="black", position=position_dodge(), alpha = 0.5, show.legend = FALSE) +
 theme_classic() +
-ylab(expression("log"[2]*"FC")) +
+ylab("Fold Change") +
 xlab("") +
 theme(legend.title = element_blank(), axis.title = element_text(size=16), axis.text.y = element_text(size=16, color = "black"), axis.text.x = element_text(angle = 45, size = 16, color = "black", hjust = 1), legend.text = element_text(size = 16, color = "black")) +
 scale_fill_manual(values = c("deepskyblue3")) +
-coord_cartesian(ylim = c(-2, 5))
+geom_errorbar(aes(ymin=observed/CI95low,ymax=observed/CI95high),position=position_dodge(0.9),width=0.2)
 ggsave("~/figures/grsf1_pqs_gat.pdf", width = 5, height = 10, units= 'cm')
 
 
@@ -556,14 +556,14 @@ data_genomic_ddx3x[annotation == "5UTR", annotation := "5'UTR"]
 data_genomic_ddx3x[annotation == "3UTR", annotation := "3'UTR"]
 data_genomic_ddx3x$annotation <- factor(data_genomic_ddx3x$annotation, levels = c("5'UTR", "exon", "intron", "3'UTR"))
 
-gg <- ggplot(data_genomic_ddx3x, aes(x=annotation, y=l2fold, fill=library)) +
+gg <- ggplot(data_genomic_ddx3x, aes(x=annotation, y=fold, fill=library)) +
 geom_bar(stat="identity", color="black", position=position_dodge(), alpha = 0.5) +
 theme_classic() +
-ylab(expression("log"[2]*"FC")) +
+ylab("Fold Change") +
 xlab("") +
 theme(legend.title = element_blank(), axis.title = element_text(size=16), axis.text.y = element_text(size=16, color = "black"), axis.text.x = element_text(angle = 45, size = 16, color = "black", hjust = 1), legend.text = element_text(size = 16, color = "black")) +
 scale_fill_manual(values = c("seagreen3", "seagreen4"), labels = c("WT")) +
-coord_cartesian(ylim = c(-2, 6))
+geom_errorbar(aes(ymin=observed/CI95low,ymax=observed/CI95high),position=position_dodge(0.9),width=0.2)
 ggsave("~/figures/ddx3x_genomic_gat.pdf", width = 10, height = 10, units= 'cm')
 
 
@@ -578,7 +578,7 @@ ylab(expression("log"[2]*"FC")) +
 xlab("") +
 theme(legend.title = element_blank(), axis.title = element_text(size=16), axis.text.y = element_text(size=16, color = "black"), axis.text.x = element_text(angle = 45, size = 16, color = "black", hjust = 1), legend.text = element_text(size = 16, color = "black")) +
 scale_fill_manual(values = c("seagreen3", "seagreen4"), labels = c("mRG", "WT")) +
-coord_cartesian(ylim = c(-2, 6))
+geom_errorbar(aes(ymin=observed/CI95low,ymax=observed/CI95high),position=position_dodge(0.9),width=0.2)
 ggsave("~/figures/ddx3x_pqs_gat.pdf", width = 8, height = 10, units= 'cm')
 ```
 
