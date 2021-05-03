@@ -22,9 +22,6 @@
 
 Sample | Replicate | File name | GEO GSE | GEO GSM
 :--------:|:---------:|:---------:|:-------:|:-------:
-pcDNA5 | 1 | pc5_rep1.fastq.gz | - | -
-pcDNA5 | 2 | pc5_rep2.fastq.gz | - | -
-pcDNA5 | 3 | pc5_rep3.fastq.gz | - | -
 DHX36_WT | 1 | DHX36_WT_rep1.fastq.gz | - | -
 DHX36_WT | 2 | DHX36_WT_rep2.fastq.gz | - | -
 DHX36_WT | 3 | DHX36_WT_rep3.fastq.gz | - | -
