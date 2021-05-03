@@ -36,7 +36,7 @@ GRSF1 | 2 | GRSF1_rep2.fastq.gz | - | -
 GRSF1 | 3 | GRSF1_rep3.fastq.gz | - | -
 
 
-### Trim illumina adapters and quality trimming
+## Trim illumina adapters and quality trimming
 
 ```bash
 cd ~/fastq
