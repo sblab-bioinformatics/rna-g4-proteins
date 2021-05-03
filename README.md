@@ -3,16 +3,15 @@ This repository contains data access and computational analyses for the methods 
  
 ## Data
 
-All the raw sequencing data have been deposited in the Gene Expression Omnibus (GEO) under accession number GSE154570
+All HEK293 raw sequencing data have been deposited in the Gene Expression Omnibus (GEO) under accession numbers GSE154570 and GSEXXXX
 
 The proteomics raw peptide intensities obtained from Tandem-mass tag mass spectrometry are in `data/DMSO_PDS_Peptideintensities.xlsx` and as Supplementary Data in the manuscript
 
 
 ## Code
 
-Data analyses scripts for HEK293:
-
 - [iCLIP](scripts/iclip.md)
 - [BG4 RIP-seq](scripts/bg4ripseq.md)
 - [Polysome profiling](scripts/polysome-profiling.md)
 - [Proteomics](scripts/proteomics.md)
+- [RNA-seq](scripts/rnaseq.md)
