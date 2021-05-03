@@ -1,4 +1,4 @@
-This repository contains data access and computational analyses for the methods developed in the manuscript Varshney D. *et al.*, 2020 (submitted)
+This repository contains data access and computational analyses for the methods developed in the manuscript Varshney D. *et al.*, 2021 (submitted)
  
  
 ## Data
