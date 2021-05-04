@@ -147,3 +147,15 @@ GRSF1_WT_RNASeq_rep3 -p \"max\""
 plotCorrelation -in GRSF1_WT_transcripts.npz -o ../plotCorrelation/GRSF1_WT_transcripts.scatter.png -c pearson -p scatterplot \
 -l "CLIP_rep1" "CLIP_rep2" "CLIP_rep3" "CLIP_rep4" "RNAseq_rep1" "RNASeq_rep2" "RNASeq_rep3" --removeOutliers --log1p &
 ```
+
+## Bigwigs
+
+```bash
+cd ~/bam
+
+for bam in *.clean.bam
+do
+  bname=${bam%.bam}
+  sbatch -J $bname -o ../bw/$bname.log --mem 32G --wrap "bamCoverage -b $bam -o ../bw/$bname.bw -of bigwig --binSize 1 -p 20 --normalizeUsing CPM"
+done
+```
