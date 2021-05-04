@@ -124,10 +124,6 @@ sbatch --mem 32G -o DHX36_WT.multiBamSummary.out -e DHX36_WT.multBamSummary.err 
 -out DHX36_WT_transcripts.npz \
 -l DHX36_WT_CLIP_rep1 DHX36_WT_CLIP_rep2 DHX36_WT_CLIP_rep3 DHX36_WT_RNAseq_rep1 DHX36_WT_RNASeq_rep2 DHX36_WT_RNASeq_rep3 -p \"max\""
 
-plotCorrelation -in DHX36_WT_transcripts.npz -o ../plotCorrelation/DHX36_WT_transcripts.png -c pearson -p heatmap \
--l "CLIP_rep1" "CLIP_rep2" "CLIP_rep3" "RNAseq_rep1" "RNASeq_rep2" "RNASeq_rep3" \
---removeOutliers --colorMap Reds --plotNumbers &
-
 plotCorrelation -in DHX36_WT_transcripts.npz -o ../plotCorrelation/DHX36_WT_transcripts.scatter.png -c pearson -p scatterplot \
 -l "CLIP_rep1" "CLIP_rep2" "CLIP_rep3" "RNAseq_rep1" "RNASeq_rep2" "RNASeq_rep3" --removeOutliers --log1p &
 
@@ -137,10 +133,6 @@ sbatch --mem 32G -o DHX36_DAIH.multiBamSummary.out -e DHX36_DAIH.multBamSummary.
 -out DHX36_DAIH_transcripts.npz \
 -l DHX36_DAIH_CLIP_rep1 DHX36_DAIH_CLIP_rep2 DHX36_DAIH_CLIP_rep3 DHX36_DAIH_RNAseq_rep1 DHX36_DAIH_RNASeq_rep2 DHX36_DAIH_RNASeq_rep3 \
 -p \"max\""
-
-plotCorrelation -in DHX36_DAIH_transcripts.npz -o ../plotCorrelation/DHX36_DAIH_transcripts.png -c pearson -p heatmap \
--l "CLIP_rep1" "CLIP_rep2" "CLIP_rep3" "RNAseq_rep1" "RNASeq_rep2" "RNASeq_rep3" \
---removeOutliers --colorMap Reds --plotNumbers &
 
 plotCorrelation -in DHX36_DAIH_transcripts.npz -o ../plotCorrelation/DHX36_DAIH_transcripts.scatter.png -c pearson -p scatterplot \
 -l "CLIP_rep1" "CLIP_rep2" "CLIP_rep3" "RNAseq_rep1" "RNASeq_rep2" "RNASeq_rep3" --removeOutliers --log1p &
