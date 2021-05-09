@@ -29,26 +29,26 @@
 
 ## Libraries
 
-Polysomal fraction | File name
-:------:|:---------:
-AML | AML.fastq.gz
-AM11 | AM11.fastq.gz
-A2L | A2L.fastq.gz
-A211 | A211.fastq.gz
-A10L | A10L.fastq.gz
-A1011 | A1011.fastq.gz
-BML | BML.fastq.gz
-BM11 | BM11.fastq.gz
-B2L | B2L.fastq.gz
-B211 | B211.fastq.gz
-B10L | B10L.fastq.gz
-B1011 | B1011.fastq.gz
-CML | CML.fastq.gz
-CM11 | CM11.fastq.gz
-C2L | C2L.fastq.gz
-C211 | C211.fastq.gz
-C10L | C10L.fastq.gz
-C1011 | C1011.fastq.gz
+Polysomal fraction | File name | GEO GSE | GEO GSM
+:------:|:-------:|:------:|:-------:|
+AML | AML.fastq.gz | GSE154570 | GSM4875931
+AM11 | AM11.fastq.gz | GSE154570 | GSM4875932
+A2L | A2L.fastq.gz | GSE154570 | GSM4875933
+A211 | A211.fastq.gz | GSE154570 | GSM4875934
+A10L | A10L.fastq.gz | GSE154570 | GSM4875935
+A1011 | A1011.fastq.gz | GSE154570 | GSM4875936
+BML | BML.fastq.gz | GSE154570 | GSM4875937
+BM11 | BM11.fastq.gz | GSE154570 | GSM4875938
+B2L | B2L.fastq.gz | GSE154570 | GSM4875939
+B211 | B211.fastq.gz | GSE154570 | GSM4875940
+B10L | B10L.fastq.gz | GSE154570 | GSM4875941
+B1011 | B1011.fastq.gz | GSE154570 | GSM4875942
+CML | CML.fastq.gz | GSE154570 | GSM4875943
+CM11 | CM11.fastq.gz | GSE154570 | GSM4875944
+C2L | C2L.fastq.gz | GSE154570 | GSM4875945
+C211 | C211.fastq.gz | GSE154570 | GSM4875946
+C10L | C10L.fastq.gz | GSE154570 | GSM4875947
+C1011 | C1011.fastq.gz | GSE154570 | GSM4875948
 
 
 ## Trim illumina adapters and quality trimming
