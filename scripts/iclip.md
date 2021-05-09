@@ -44,16 +44,16 @@
 
 Protein | Genotype | Replicate | File name | GEO GSE | GEO GSM
 :------:|:--------:|:---------:|:---------:|:-------:|:-------:
-DHX36 | WT | 1 | DHX36_WT1.fastq.gz | - | -
-DHX36 | WT | 2 | DHX36_WT2.fastq.gz | - | -
-DHX36 | WT | 3 | DHX36_WT3.fastq.gz | - | -
-DHX36 | EA | 1 | DHX36_EA1.fastq.gz | - | -
-DHX36 | EA | 2 | DHX36_EA2.fastq.gz | - | -
-DHX36 | EA | 3 | DHX36_EA3.fastq.gz | - | -
-GRSF1 | WT | 1 | GRSF1_WT1.fastq.gz | - | -
-GRSF1 | WT | 2 | GRSF1_WT2.fastq.gz | - | -
-GRSF1 | WT | 3 | GRSF1_WT3.fastq.gz | - | -
-GRSF1 | WT | 3 | GRSF1_WT3.fastq.gz | - | -
+DHX36 | WT | 1 | DHX36_WT1.fastq.gz | GSE154570 | GSM4875921
+DHX36 | WT | 2 | DHX36_WT2.fastq.gz | GSE154570 | GSM4875922
+DHX36 | WT | 3 | DHX36_WT3.fastq.gz | GSE154570 | GSM4875923
+DHX36 | EA | 1 | DHX36_EA1.fastq.gz | GSE154570 | GSM4875924
+DHX36 | EA | 2 | DHX36_EA2.fastq.gz | GSE154570 | GSM4875925
+DHX36 | EA | 3 | DHX36_EA3.fastq.gz | GSE154570 | GSM4875926
+GRSF1 | WT | 1 | GRSF1_WT1.fastq.gz | GSE154570 | GSM4875927
+GRSF1 | WT | 2 | GRSF1_WT2.fastq.gz | GSE154570 | GSM4875928
+GRSF1 | WT | 3 | GRSF1_WT3.fastq.gz | GSE154570 | GSM4875929
+GRSF1 | WT | 3 | GRSF1_WT3.fastq.gz | GSE154570 | GSM4875930
 DDX3X | WT | 1 | DDX3X_WT1.fastq.gz | GSE106476 | GSM2838585
 DDX3X | WT | 2 | DDX3X_WT2.fastq.gz | GSE106476 | GSM2838586
 DDX3X | WT | 3 | DDX3X_WT3.fastq.gz | GSE106476 | GSM2838587
