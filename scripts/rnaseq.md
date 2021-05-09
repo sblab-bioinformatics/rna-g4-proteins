@@ -23,15 +23,15 @@
 
 Sample | Replicate | File name | GEO GSE | GEO GSM
 :--------:|:---------:|:---------:|:-------:|:-------:
-DHX36_WT | 1 | DHX36_WT_rep1.fastq.gz | - | -
-DHX36_WT | 2 | DHX36_WT_rep2.fastq.gz | - | -
-DHX36_WT | 3 | DHX36_WT_rep3.fastq.gz | - | -
-DHX36_DAIH | 1 | DHX36_DAIH_rep1.fastq.gz | - | -
-DHX36_DAIH | 2 | DHX36_DAIH_rep2.fastq.gz | - | -
-DHX36_DAIH | 3 | DHX36_DAIH_rep3.fastq.gz | - | -
-GRSF1 | 1 | GRSF1_rep1.fastq.gz | - | -
-GRSF1 | 2 | GRSF1_rep2.fastq.gz | - | -
-GRSF1 | 3 | GRSF1_rep3.fastq.gz | - | -
+DHX36_WT | 1 | DHX36_WT_rep1.fastq.gz | GSE154570 | GSM5283753
+DHX36_WT | 2 | DHX36_WT_rep2.fastq.gz | GSE154570 | GSM5283754
+DHX36_WT | 3 | DHX36_WT_rep3.fastq.gz | GSE154570 | GSM5283755
+DHX36_DAIH | 1 | DHX36_DAIH_rep1.fastq.gz | GSE154570 | GSM5283756
+DHX36_DAIH | 2 | DHX36_DAIH_rep2.fastq.gz | GSE154570 | GSM5283757
+DHX36_DAIH | 3 | DHX36_DAIH_rep3.fastq.gz | GSE154570 | GSM5283758
+GRSF1 | 1 | GRSF1_rep1.fastq.gz | GSE154570 | GSM5283759
+GRSF1 | 2 | GRSF1_rep2.fastq.gz | GSE154570 | GSM5283760
+GRSF1 | 3 | GRSF1_rep3.fastq.gz | GSE154570 | GSM5283761
 
 
 ## Trim illumina adapters and quality trimming
