@@ -28,15 +28,15 @@
 
 Sample | Replicate | File name | GEO GSE | GEO GSM
 :--------:|:---------:|:---------:|:-------:|:-------:
-BG4 | 1 | BG4_1.fastq.gz | - | -
-BG4 | 2 | BG4_2.fastq.gz | - | -
-BG4 | 3 | BG4_3.fastq.gz | - | -
-A9 | 1 | A9_1.fastq.gz | - | -
-A9 | 2 | A9_2.fastq.gz | - | -
-A9 | 3 | A9_3.fastq.gz | - | -
-INPUT | 1 | INPUT_1.fastq.gz | - | -
-INPUT | 2 | INPUT_2.fastq.gz | - | -
-INPUT | 3 | INPUT_3.fastq.gz | - | -
+BG4 | 1 | BG4_1.fastq.gz | GSE154570 | GSM4875912
+BG4 | 2 | BG4_2.fastq.gz | GSE154570 | GSM4875913
+BG4 | 3 | BG4_3.fastq.gz | GSE154570 | GSM4875914
+A9 | 1 | A9_1.fastq.gz | GSE154570 | GSM4875915
+A9 | 2 | A9_2.fastq.gz | GSE154570 | GSM4875916
+A9 | 3 | A9_3.fastq.gz | GSE154570 | GSM4875917
+INPUT | 1 | INPUT_1.fastq.gz | GSE154570 | GSM4875918
+INPUT | 2 | INPUT_2.fastq.gz | GSE154570 | GSM4875919
+INPUT | 3 | INPUT_3.fastq.gz | GSE154570 | GSM4875920
 
 
 ## Trim illumina adapters and quality trimming
