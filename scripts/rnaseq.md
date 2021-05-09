@@ -6,6 +6,7 @@
 - [Trim illumina adapters and quality trimming](#trim-illumina-adapters-and-quality-trimming)
 - [Alignment](#alignment)
 - [Deeptools](#deeptools)
+- [Bigwigs](#bigwigs)
 
 
 ## Software requirements
