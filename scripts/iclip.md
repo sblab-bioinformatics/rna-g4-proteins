@@ -724,6 +724,107 @@ do
 done
 ```
 
+### test peak significances
+
+```r
+library(data.table)
+
+############
+# DHX36_WT #
+############
+dhx36 <- fread("zcat DHX36_WT.mat.gz | tail -n +2")
+
+#columns:
+# V7 -500
+# V507 s
+# V556 e
+# V1056 +500
+#rows:
+# g3l7 1:952
+# g3l12 953:2475
+
+peak <- as.vector(as.matrix(dhx36[953:2475, 531:581]))
+bg_all <- as.vector(as.matrix(dhx36[953:2475, c(7:530,582:1056)]))
+bg_up <- as.vector(as.matrix(dhx36[953:2475, 7:530]))
+bg_down <- as.vector(as.matrix(dhx36[953:2475, 582:1056]))
+
+# peak vs bg_all
+wilcox.test(peak, bg_all) # W = 8.4253e+10, p-value < 2.2e-16
+ks.test(peak, bg_all) # D = 0.36961, p-value < 2.2e-16
+
+# peak vs bg_up
+wilcox.test(peak, bg_up) # W = 4.4053e+10, p-value < 2.2e-16
+ks.test(peak, bg_up) # D = 0.36775, p-value < 2.2e-16
+
+# peak vs bg_down
+wilcox.test(peak, bg_down) # W = 4.02e+10, p-value < 2.2e-16
+ks.test(peak, bg_down) # D = 0.37307, p-value < 2.2e-16
+
+
+############
+# DDX3X_WT #
+############
+ddx3x <- fread("zcat DDX3X_WT.mat.gz | tail -n +2")
+
+#columns:
+# V7 -500
+# V507 s
+# V556 e
+# V1056 +500
+#rows:
+# g3l7 1:351
+# g3l12 352:1018
+
+peak <- as.vector(as.matrix(ddx3x[352:1018, 307:506]))
+bg_all <- as.vector(as.matrix(ddx3x[352:1018, c(7:306,507:1056)]))
+bg_up <- as.vector(as.matrix(ddx3x[352:1018, 7:306]))
+bg_down <- as.vector(as.matrix(ddx3x[352:1018, 507:1056]))
+
+# peak vs bg_all
+wilcox.test(peak, bg_all) # W = 4.8096e+10, p-value < 2.2e-16
+ks.test(peak, bg_all) # D = 0.24006, p-value < 2.2e-16
+
+# peak vs bg_up
+wilcox.test(peak, bg_up) # W = 1.7674e+10, p-value < 2.2e-16
+ks.test(peak, bg_up) # D = 0.28659, p-value < 2.2e-16
+
+# peak vs bg_down
+wilcox.test(peak, bg_down) # W = 3.0422e+10, p-value < 2.2e-16
+ks.test(peak, bg_down) # D = 0.21468, p-value < 2.2e-16
+
+
+############
+# GRSF1_WT #
+############
+grsf1 <- fread("zcat GRSF1_WT.mat.gz | tail -n +2")
+
+#columns:
+# V7 -500
+# V507 s
+# V556 e
+# V1056 +500
+#rows:
+# g3l7 1:2277
+# g3l12 2278:6139
+
+peak <- as.vector(as.matrix(grsf1[2278:6139, 507:556]))
+bg_all <- as.vector(as.matrix(grsf1[2278:6139, c(7:506,557:1056)]))
+bg_up <- as.vector(as.matrix(grsf1[2278:6139, 7:506]))
+bg_down <- as.vector(as.matrix(grsf1[2278:6139, 557:1056]))
+
+# peak vs bg_all
+wilcox.test(peak, bg_all) # W = 5.8538e+11, p-value < 2.2e-16
+ks.test(peak, bg_all) # D = 0.49735, p-value < 2.2e-16
+
+# peak vs bg_up
+wilcox.test(peak, bg_up) # W = 2.9415e+11, p-value < 2.2e-16
+ks.test(peak, bg_up) # D = 0.50468, p-value < 2.2e-16
+
+# peak vs bg_down
+wilcox.test(peak, bg_down) # W = 2.9123e+11, p-value < 2.2e-16
+ks.test(peak, bg_down) # D = 0.49002, p-value < 2.2e-16
+```
+
 
 ## Transcripts analysis
 
