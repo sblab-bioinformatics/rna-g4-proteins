@@ -47,9 +47,6 @@ Protein | Genotype | Replicate | File name | GEO GSE | GEO GSM
 DHX36 | WT | 1 | DHX36_WT1.fastq.gz | GSE154570 | GSM4875921
 DHX36 | WT | 2 | DHX36_WT2.fastq.gz | GSE154570 | GSM4875922
 DHX36 | WT | 3 | DHX36_WT3.fastq.gz | GSE154570 | GSM4875923
-DHX36 | EA | 1 | DHX36_EA1.fastq.gz | GSE154570 | GSM4875924
-DHX36 | EA | 2 | DHX36_EA2.fastq.gz | GSE154570 | GSM4875925
-DHX36 | EA | 3 | DHX36_EA3.fastq.gz | GSE154570 | GSM4875926
 GRSF1 | WT | 1 | GRSF1_WT1.fastq.gz | GSE154570 | GSM4875927
 GRSF1 | WT | 2 | GRSF1_WT2.fastq.gz | GSE154570 | GSM4875928
 GRSF1 | WT | 3 | GRSF1_WT3.fastq.gz | GSE154570 | GSM4875929
@@ -246,14 +243,6 @@ awk -v OFS="\t" 'function abs(x){return ((x < 0.0) ? -x : x)} {print $1, $2, $3,
 bedtools merge -s -d -1 -c 6,7,8,8 -o distinct,min,distinct,count_distinct -i - | \
 awk -v OFS="\t" '$7 > 2 {print $1, $2, $3, $5, $7, $4}' > DHX36_WT.clean.peaks.consensus.bed
 
-# DHX36 EA - 3 in 3
-tableCat.py -i DHX36_{EA1,EA2,EA3}.clean.peaks.bed | \
-grep "^chr*" | \
-sort -k1,1 -k2,2n | \
-awk -v OFS="\t" 'function abs(x){return ((x < 0.0) ? -x : x)} {print $1, $2, $3, $4, $5, $6, abs($7), $8}' | \
-bedtools merge -s -d -1 -c 6,7,8,8 -o distinct,min,distinct,count_distinct -i - | \
-awk -v OFS="\t" '$7 > 2 {print $1, $2, $3, $5, $7, $4}' > DHX36_EA.clean.peaks.consensus.bed
-
 # GRSF1 WT - 3 in 4
 tableCat.py -i GRSF1_{WT1,WT2,WT3,WT4}.clean.peaks.bed | \
 grep "^chr*" | \
@@ -280,69 +269,6 @@ cat DHX36_{WT1,WT2,WT3}.clean.peaks.bed GRSF1_{WT1,WT2,WT3,WT4}.clean.peaks.bed 
 grep "^chr*" | \
 sort -k1,1 -k2,2n | \
 bedtools merge -s -d -1 -c 6 -o distinct -i - > DHX36_WT_GRSF1_WT_DDX3X_WT_union.clean.peaks.bed
-```
-
-
-## Venn diagram
-
-Intersections:
-
-```bash
-cd ~/piranha
-
-# DHX36 EA and WT intersection
-bedtools intersect \
--a DHX36_EA.clean.peaks.consensus.bed \
--b DHX36_WT.clean.peaks.consensus.bed \
--wa -u > DHX36_EAiWT.clean.peaks.consensus.bed
-
-# DHX36 WT and EA intersection
-bedtools intersect \
--a DHX36_WT.clean.peaks.consensus.bed \
--b DHX36_EA.clean.peaks.consensus.bed \
--wa -u > DHX36_WTiEA.clean.peaks.consensus.bed
-
-# DHX36 EA unique
-bedtools intersect \
--a DHX36_EA.clean.peaks.consensus.bed \
--b DHX36_WT.clean.peaks.consensus.bed \
--v > DHX36_EAu.clean.peaks.consensus.bed
-
-# DHX36 WT unique
-bedtools intersect \
--a DHX36_WT.clean.peaks.consensus.bed \
--b DHX36_EA.clean.peaks.consensus.bed \
--v > DHX36_WTu.clean.peaks.consensus.bed
-```
-
-Venn diagrams:
-
-```r
-library(VennDiagram)
-
-# EAu, EAiWT and WTu - all peaks
-venn.plot <- draw.pairwise.venn(
-  area1 = 24290,
-  area2 = 10891,
-  cross.area = 9075,
-  category = c("EA\n (24290)", "WT\n (10891)"),
-  ext.percent = 0.1,
-  fill = c("darkgoldenrod1", "darkgoldenrod"),
-  cex = 2,
-  fontfamily = "sans",
-  cat.pos = c(-50, 30),
-  cat.dist = c(0.08, 0.08),
-  cat.cex = 2,
-  cat.fontfamily = "sans",
-  ext.pos = 90,
-  ext.dist = -0.05,
-  print.mode = c("raw", "percent"),
-  sigdigs = 2,
-  margin = 0.075)
-
-pdf("~/figures/EAu_EAiWT_WTu_all.pdf")
-g <- grid.draw(venn.plot)
-dev.off()
 ```
 
 
@@ -445,8 +371,7 @@ mkdir ../gat/
 annotations=~/annotation/GRCh38.p12.genome.clean.gencode.v28.annotation.sorted.bed
 mappable_g=~/annotation/gencode.v28.annotation.sorted.genes.bed
 
-for bed in DHX36_EA.clean.peaks.consensus.bed \
-DHX36_WT.clean.peaks.consensus.bed \
+for bed in DHX36_WT.clean.peaks.consensus.bed \
 GRSF1_WT.clean.peaks.consensus.bed \
 DDX3X_WT.clean.peaks.consensus.bed
 do
@@ -588,8 +513,7 @@ ggsave("~/figures/ddx3x_pqs_gat.pdf", width = 8, height = 10, units= 'cm')
 ```bash
 cd ~/piranha
 
-for peaks in DHX36_EA.clean.peaks.consensus.bed \
-DHX36_WT.clean.peaks.consensus.bed \
+for peaks in DHX36_WT.clean.peaks.consensus.bed \
 GRSF1_WT.clean.peaks.consensus.bed \
 DDX3X_WT.clean.peaks.consensus.bed
 do
@@ -680,7 +604,7 @@ cd ~/bam
 mkdir ../bam_merge
 mkdir ../bw_merge
 
-for id in DDX3X_WT DHX36_EA DHX36_WT GRSF1_WT
+for id in DDX3X_WT DHX36_WT GRSF1_WT
 do
   bams=`echo $id*.clean.bam`
   sbatch -J $id -o ../bam_merge/$id.log --mem 8G --wrap "samtools merge -@ 20 ../bam_merge/$id.clean.bam $bams && \
@@ -1049,8 +973,7 @@ cat <(grep "^chr" GRCh38.p12.genome.clean.g3l7.g3l12.bulges.bed) <(grep "^chr" G
 ```bash
 cd ~/piranha
 
-for peaks in DHX36_EA.clean.peaks.consensus.bed \
-DHX36_WT.clean.peaks.consensus.bed \
+for peaks in DHX36_WT.clean.peaks.consensus.bed \
 GRSF1_WT.clean.peaks.consensus.bed \
 DDX3X_WT.clean.peaks.consensus.bed
 do
@@ -1082,8 +1005,7 @@ The legend is:
 ```bash
 cd ~/piranha
 
-for peaks in DHX36_EA.clean.peaks.consensus.bed \
-DHX36_WT.clean.peaks.consensus.bed \
+for peaks in DHX36_WT.clean.peaks.consensus.bed \
 GRSF1_WT.clean.peaks.consensus.bed \
 DDX3X_WT.clean.peaks.consensus.bed
 do
