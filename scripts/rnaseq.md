@@ -26,9 +26,6 @@ Sample | Replicate | File name | GEO GSE | GEO GSM
 DHX36_WT | 1 | DHX36_WT_rep1.fastq.gz | GSE154570 | GSM5283753
 DHX36_WT | 2 | DHX36_WT_rep2.fastq.gz | GSE154570 | GSM5283754
 DHX36_WT | 3 | DHX36_WT_rep3.fastq.gz | GSE154570 | GSM5283755
-DHX36_DAIH | 1 | DHX36_DAIH_rep1.fastq.gz | GSE154570 | GSM5283756
-DHX36_DAIH | 2 | DHX36_DAIH_rep2.fastq.gz | GSE154570 | GSM5283757
-DHX36_DAIH | 3 | DHX36_DAIH_rep3.fastq.gz | GSE154570 | GSM5283758
 GRSF1 | 1 | GRSF1_rep1.fastq.gz | GSE154570 | GSM5283759
 GRSF1 | 2 | GRSF1_rep2.fastq.gz | GSE154570 | GSM5283760
 GRSF1 | 3 | GRSF1_rep3.fastq.gz | GSE154570 | GSM5283761
@@ -107,16 +104,15 @@ cd ~/bam
 
 mkdir -p ../deeptools/{multiBamSummary,plotCorrelation}
 
-nohup multiBamSummary bins -b pc5_rep*.clean.bam DHX36_WT_rep*.clean.bam DHX36_DAIH_rep*.clean.bam GRSF1_rep*.clean.bam \
+nohup multiBamSummary bins -b pc5_rep*.clean.bam DHX36_WT_rep*.clean.bam GRSF1_rep*.clean.bam \
 -out ../deeptools/multiBamSummary/bins.npz \
--l pcDNA5_1 pcDNA5_2 pcDNA5_3 DHX36_WT_1 DHX36_WT_2 DHX36_WT_3 DHX36_DAIH_1 DHX36_DAIH_2 DHX36_DAIH_3 GRSF1_1 GRSF1_2 GRSF1_3 \
+-l pcDNA5_1 pcDNA5_2 pcDNA5_3 DHX36_WT_1 DHX36_WT_2 DHX36_WT_3 GRSF1_1 GRSF1_2 GRSF1_3 \
 -p "max" &
 
 cd ../deeptools/multiBamSummary
 
 plotCorrelation -in bins.npz -o ../plotCorrelation/20180918_bins_pearson_heatmap.png -c pearson -p heatmap \
--l "pcDNA5_1" "pcDNA5_2" "pcDNA5_3" "DHX36_WT_1" "DHX36_WT_2" "DHX36_WT_3" "DHX36_DAIH_1" "DHX36_DAIH_2" \
-"DHX36_DAIH_3" "GRSF1_1" "GRSF1_2" "GRSF1_3" \
+-l "pcDNA5_1" "pcDNA5_2" "pcDNA5_3" "DHX36_WT_1" "DHX36_WT_2" "DHX36_WT_3" "GRSF1_1" "GRSF1_2" "GRSF1_3" \
 --removeOutliers --colorMap Reds --plotNumbers &
 
 sbatch --mem 32G -o DHX36_WT.multiBamSummary.out -e DHX36_WT.multBamSummary.err -J DHX36_WT --wrap "multiBamSummary BED-file \
@@ -126,16 +122,6 @@ sbatch --mem 32G -o DHX36_WT.multiBamSummary.out -e DHX36_WT.multBamSummary.err 
 -l DHX36_WT_CLIP_rep1 DHX36_WT_CLIP_rep2 DHX36_WT_CLIP_rep3 DHX36_WT_RNAseq_rep1 DHX36_WT_RNASeq_rep2 DHX36_WT_RNASeq_rep3 -p \"max\""
 
 plotCorrelation -in DHX36_WT_transcripts.npz -o ../plotCorrelation/DHX36_WT_transcripts.scatter.png -c pearson -p scatterplot \
--l "CLIP_rep1" "CLIP_rep2" "CLIP_rep3" "RNAseq_rep1" "RNASeq_rep2" "RNASeq_rep3" --removeOutliers --log1p &
-
-sbatch --mem 32G -o DHX36_DAIH.multiBamSummary.out -e DHX36_DAIH.multBamSummary.err -J DHX36_DAIH --wrap "multiBamSummary BED-file \
---BED ~/reference/gencode.v28.annotation.sorted.transcripts.bed \
--b ~/bam/DHX36_EA*.clean.bam ~/bam_iclip/DHX36_DAIH_rep*.clean.bam \
--out DHX36_DAIH_transcripts.npz \
--l DHX36_DAIH_CLIP_rep1 DHX36_DAIH_CLIP_rep2 DHX36_DAIH_CLIP_rep3 DHX36_DAIH_RNAseq_rep1 DHX36_DAIH_RNASeq_rep2 DHX36_DAIH_RNASeq_rep3 \
--p \"max\""
-
-plotCorrelation -in DHX36_DAIH_transcripts.npz -o ../plotCorrelation/DHX36_DAIH_transcripts.scatter.png -c pearson -p scatterplot \
 -l "CLIP_rep1" "CLIP_rep2" "CLIP_rep3" "RNAseq_rep1" "RNASeq_rep2" "RNASeq_rep3" --removeOutliers --log1p &
 
 sbatch --mem 32G -o GRSF1_WT.multiBamSummary.out -e GRSF1_WT.multBamSummary.err -J GRSF1_WT --wrap "multiBamSummary BED-file \
